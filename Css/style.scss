@@ -8,6 +8,15 @@ body {
     height: 100vh;
     margin: 0;
     overflow: hidden;
+    animation: backgroundRandomize 0.1s 6s infinite;
+}
+@keyframes backgroundRandomize {
+    0% {
+        background: #8f0606;
+    }
+    100% {
+        background: #c40000;
+    }
 }
 @keyframes onload {
     0% {
@@ -59,6 +68,7 @@ body {
     "wdth" 100;
     font-size: 50px;
     transition: all 0.25s ease-in-out;
+    text-align: center;
 }
 .text:hover {
     font-size: 100px;
