@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;1,100&display=swap');
+body {
+    background: #8f0606;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+@keyframes onload {
+    0% {
+        display: block;
+        font-size: 0px;
+    }
+    100% {
+        
+        font-size: 100px;
+    }
+}
+@keyframes shrink {
+    0% {
+        font-size: 100px;
+    }
+    100% {
+        font-size: 50px;
+    }
+}
+@keyframes stretch {
+    0% {
+        width: 0px;
+    }
+    100% {
+        width: 3000px;
+    }
+}
+#greetings {
+    font-size: 0px;
+    animation: onload 0.5s ease-in-out, shrink 0.5s ease-in-out 2s;
+    animation-fill-mode: forwards;
+}
+#mario {
+    animation: onload 0.5s ease-in-out 2s, shrink 0.5s ease-in-out 4s;
+    animation-fill-mode: forwards;
+    font-size: 0px;
+    
+}
+#bye {
+    animation: onload 0.5s ease-in-out 4s, shrink 0.5s ease-in-out 6s;
+    animation-fill-mode: forwards;
+    font-size: 0px;
+}
+.text {
+    color: #ffffff;
+    font-family: 'Roboto', serif;
+    font-weight: 100;
+    font-variation-settings:
+    "wdth" 100;
+    font-size: 50px;
+    transition: all 0.25s ease-in-out;
+}
+.text:hover {
+    font-size: 100px;
+    font-weight: 500;
+}
+#image {
+    animation: stretch 20s 6s forwards;
+    width: 0px;
+    height: 100px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: block;
+}
