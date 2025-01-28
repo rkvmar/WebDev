@@ -5,7 +5,7 @@ const subtext = ['They/Them', 'Ze/Zir', 'E/Em', 'Xe/Xem', 'Ask'];
 // const subtext = ['average person', 'average failure']
 let currentSubtextIndex = 0;
 const subtextElement = document.getElementById('subtext');
-const subtextText = document.querySelector('#subtextText');
+const subtextText = document.querySelector('#subtextText');s
 
 // Initialize pronouns text when page loads
 subtextText.textContent = subtext[currentSubtextIndex];
