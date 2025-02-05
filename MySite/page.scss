@@ -12,7 +12,7 @@ body {
 #header {
     background-color: rgb(215, 194, 255);
     width: 100%;
-    height: 100%;
+    height: 80px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,23 +25,15 @@ body {
     scroll-snap-stop: always;
     text-align: center;
     padding: 0;
-    
-    &.scrolled {
-        height: 80px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        
-        #name {
-            font-size: 2rem;
-        }
-    }
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #main {
     background-color: rgb(236, 225, 255);
     width: 100%;
+    top: 80px;
     min-height: calc(100vh - 80px);
     position: relative;
-    top: 100vh;
     scroll-snap-align: start;
     scroll-snap-stop: always;
     display: flex;
@@ -59,14 +51,13 @@ body {
     scroll-snap-align: start;
     scroll-snap-stop: always;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 3vw;
     font-family: "JetBrains Mono", serif;
 }
 #name {
-    font-size: clamp(2rem, 15vw, 20vw);
+    font-size: 2rem;
     font-weight: bold;
     color: #333;
     font-family: "JetBrains Mono", serif;
@@ -82,16 +73,12 @@ body {
     margin: 0;
     padding: 0;
     
-    &.scrolled {
-        font-size: clamp(1.5rem, 2rem, 3vw);
-    }
-    
     span {
         display: inline-flex;
         justify-content: center;
         align-items: center;
-        opacity: 0;
-        animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        opacity: 1;
+        // animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         margin-right: -0.15em;
         min-width: 0.6em;
         text-align: center;
@@ -105,10 +92,10 @@ body {
         pointer-events: none;
 
         
-        &:nth-child(1) { animation-delay: 0s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-        &:nth-child(2) { animation-delay: 0.025s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.025s forwards; }
-        &:nth-child(3) { animation-delay: 0.05s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.05s forwards; }
-        &:nth-child(4) { animation-delay: 0.075s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.075s forwards; }
+        // &:nth-child(1) { animation-delay: 0s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        // &:nth-child(2) { animation-delay: 0.025s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.025s forwards; }
+        // &:nth-child(3) { animation-delay: 0.05s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.05s forwards; }
+        // &:nth-child(4) { animation-delay: 0.075s; animation: fadeInLetter 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.075s forwards; }
     }
 }
 
@@ -190,7 +177,7 @@ body {
     align-items: center;
     font-weight: bold;
     color: #333;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
     position: relative;
 }
 .box p {
@@ -232,14 +219,8 @@ body {
     user-select: none;
     position: fixed;
     right: 20px;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1001;
-    
-    &.visible {
-        opacity: 1;
-        pointer-events: auto;
-    }
+    opacity: 1;
+    pointer-events: auto;
 }
 .hamRotate.active {
     transform: rotate(45deg);
@@ -278,17 +259,14 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    pointer-events: none;
-    
     &.active {
         opacity: 1;
         visibility: visible;
-        pointer-events: auto;
     }
     font-family: "JetBrains Mono", serif;
 }
 .menu-item {
-    font-size: 5rem;
+    font-size: 5vw;
     font-weight: bold;
     color: #333;
     transition: all 0.3s ease;
@@ -297,7 +275,7 @@ body {
     &:hover {
         transform: scale(1.05);
     }
-    
+    cursor: pointer;
 }
 .menu-item a { 
     text-decoration: none; color: #333;
@@ -314,6 +292,7 @@ body {
         // box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
         // background-color: rgb(220, 205, 255);
     }
+    
 }
 .menu-item a:visited { text-decoration: none; color: #333; }
 .menu-item a:hover { text-decoration: none; color: #333; }
@@ -331,4 +310,58 @@ body {
     scroll-snap-stop: always;
     min-height: calc(100vh - 80px);
     width: 100%;
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #333;
+    font-family: "JetBrains Mono", serif;
+    font-optical-sizing: auto;
+    top: 0;
+    position: absolute;
+}
+.body-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    font-family: "JetBrains Mono", serif;
+    text-align: center;
+}
+.project-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+    height: 30%;
+    padding: 2%;
+    gap: 3vw;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+.project-box {
+    display: inline-block;
+    margin: 0 1rem; // Add some spacing between project boxes
+}
+.project-box {
+    flex: 0 0 auto;
+    width: auto;
+    height: 100px;
+    max-width: 100%;
+    margin-right: 10px;
+    width: 30%;
+    height: 30%;
+    background-color: rgb(242, 234, 255);
+    border-radius: 10px;
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+    aspect-ratio: 1/1;
+    text-align: center;
+    text-wrap: balance;
+    transition: all 0.2s ease;
+    &:hover{
+        transform: scale(1.05);
+    }
 }

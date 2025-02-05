@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ravi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100;1,100&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="page.scss">
+</head>
+<body>
+    <div id="header">
+        <div id="name">
+            <span>R</span>
+            <span>A</span>
+            <span>V</span>
+            <span>I</span>
+        </div>
+        <svg class="ham hamRotate ham4" viewBox="0 0 100 100" width="80" onclick="this.classList.toggle('active')">
+            <path
+                  class="line top"
+                  d="m 70,33 h -40 c 0,0 -8.5,-0.149796 -8.5,8.5 0,8.649796 8.5,8.5 8.5,8.5 h 20 v -20" />
+            <path
+                  class="line middle"
+                  d="m 70,50 h -40" />
+            <path
+                  class="line bottom"
+                  d="m 30,67 h 40 c 0,0 8.5,0.149796 8.5,-8.5 0,-8.649796 -8.5,-8.5 -8.5,-8.5 h -20 v 20" />
+        </svg>
+    </div>
+    <div id="main">
+        <h1 class="title">User Agreement</h1>
+        <p class="body-text">
+            User disagrees with the content of this site.
+        </p>
+    </div>
+    <div id="menu">
+        <div class="menu-item">
+            <a href="index.html">Home</a>
+        </div>
+        <div class="menu-item">
+            <a href="about.html">About</a>
+        </div>
+        <div class="menu-item">
+            <a href="projects.html">Projects</a>
+        </div>
+        <div class="menu-item active">
+            <a class="active">User Agreement</a>
+        </div>
+        <div class="menu-item">
+            <a href="https://distrokid.com/hyperfollow/acreatunes">Music</a>
+        </div>
+        <div class="menu-item">
+            <a href="https://github.com/rkvmar">Github</a>
+        </div>
+    </div>
+    <script src="script.js" defer></script>
+</body>
+</html>
