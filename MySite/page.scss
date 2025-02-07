@@ -42,6 +42,7 @@ body {
     flex-direction: column;
     font-family: "JetBrains Mono", serif;
     scroll-snap-type: y mandatory;
+    overflow-x: hidden;
 }
 #cards {
     background-color: rgb(236, 225, 255);
@@ -336,7 +337,7 @@ body {
     width: 100%;
     height: 30%;
     padding: 2%;
-    gap: 3vw;
+    gap: 3px;
     overflow-x: auto;
     overflow-y: hidden;
     white-space: nowrap;
@@ -344,16 +345,11 @@ body {
 
 .project-box {
     display: inline-block;
-    margin: 0 1rem; // Add some spacing between project boxes
-}
-.project-box {
+    margin: 0 1rem;
     flex: 0 0 auto;
-    width: auto;
-    height: 100px;
-    max-width: 100%;
-    margin-right: 10px;
-    width: 30%;
-    height: 30%;
+    width: 25rem;
+    height: 25rem;
+    position: relative;
     background-color: rgb(242, 234, 255);
     border-radius: 10px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
@@ -361,6 +357,28 @@ body {
     text-align: center;
     text-wrap: balance;
     transition: all 0.2s ease;
+
+    & h2 {
+        margin: 1rem 0;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #333;
+        font-family: "JetBrains Mono", serif;
+    }
+
+    & p {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        font-size: 1.2rem;
+        font-weight: normal;
+        color: #333;
+        font-family: "JetBrains Mono", serif;
+        margin: 0;
+    }
+
     &:hover{
         transform: scale(1.05);
     }

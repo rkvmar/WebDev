@@ -64,6 +64,7 @@ body {
     align-items: center;
     gap: 3vw;
     font-family: "JetBrains Mono", serif;
+    transition: all 0.3s ease;
 }
 #name {
     font-size: clamp(2rem, 15vw, 20vw);
