@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const boardSize = 15;
+  const boardSize = 20;
   const totalTiles = boardSize * boardSize;
-  const redTilesCount = 5
+  const redTilesCount = 10
   const [game, setGame] = useState([]);
   const [snake, setSnake] = useState([[0, 4]]);
   const [direction, setDirection] = useState('down');
