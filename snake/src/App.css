@@ -40,24 +40,28 @@
 .read-the-docs {
   color: #888;
 }
+.cell{
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgb(217, 217, 217);
+}
 .green{
-  width:50px;
-  height:50px;
   background-color: rgb(48, 171, 130);
-  padding: 10px;
-  border: 1px solid black;
 }
 .blue{
-  width:50px;
-  height:50px;
   background-color: rgb(48, 85, 171);
-  padding: 10px;
-  border: 1px solid black;
 }
 .red{
-  width:50px;
-  height:50px;
   background-color: rgb(171, 48, 48);
-  padding: 10px;
-  border: 1px solid black;
+}
+.game{
+  display:grid;
+  grid-auto-columns: auto;
+  grid-auto-rows: auto;
+}
+.row{
+  margin: 0px;
+  padding: 0px;
+  line-height: 0;
 }
