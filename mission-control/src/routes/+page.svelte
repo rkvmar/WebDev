@@ -1,25 +1,44 @@
-<script>
+<script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { csv } from 'd3-fetch';
 	import WaypointMarker from '$lib/components/WaypointMarker.svelte';
 	import AircraftMarker from '$lib/components/AircraftMarker.svelte';
+	import Nav from '$lib/components/Nav.svelte';
 
-	let map;
-	let waypoints = [];
-	let aircraft = [];
+	let map: any;
+	let waypoints: any[] = [];
+	let aircraft: any[] = [];
 	let waypointsLoaded = false;
 	let aircraftLoaded = false;
-	let pollingInterval;
+	let pollingInterval: any;
 	// Using Map to track aircraft by their icao24 identifier
 	let aircraftMap = new Map();
 
+	// Map center and search radius
+	const centerLat = 37.61916;
+	const centerLon = -122.37412;
+	const distNM = 100; // 100 nautical miles
+
+	// Convert nautical miles to degrees (approximate)
+	// 1 nautical mile is approximately 1/60 of a degree of latitude
+	// For longitude, we need to adjust for the cosine of the latitude
+	function nmToLatLonBoundary(lat: number, lon: number, distNM: number) {
+		const latDegrees = distNM / 60;
+		const lonDegrees = distNM / (60 * Math.cos((lat * Math.PI) / 180));
+
+		return {
+			minLat: lat - latDegrees,
+			maxLat: lat + latDegrees,
+			minLon: lon - lonDegrees,
+			maxLon: lon + lonDegrees
+		};
+	}
+
+	// Calculate boundary for our area
+	const boundary = nmToLatLonBoundary(centerLat, centerLon, distNM);
+
 	// Function to fetch aircraft data
 	async function fetchAircraftData() {
-		// Central point of the map area
-		const centerLat = 37.61916;
-		const centerLon = -122.37412;
-		const distNM = 100; // Use a larger distance to ensure we get some aircraft
-
 		// Use our proxy endpoint
 		const url = `/api/aircraft?lat=${centerLat}&lon=${centerLon}&dist=${distNM}`;
 
@@ -31,6 +50,7 @@
 			}
 
 			const data = await response.json();
+			console.log('API response received, raw data:', data);
 
 			// Check the structure of the data
 			if (data.aircraft && Array.isArray(data.aircraft) && data.aircraft.length > 0) {
@@ -41,8 +61,8 @@
 
 				// Process the aircraft data
 				data.aircraft
-					.filter((plane) => plane.lat && plane.lon) // Ensure we have coordinates
-					.forEach((plane) => {
+					.filter((plane: any) => plane.lat && plane.lon) // Ensure we have coordinates
+					.forEach((plane: any) => {
 						const aircraftData = [
 							plane.hex || plane.icao, // icao24 [0]
 							plane.flight?.trim() || 'N/A', // callsign [1]
@@ -94,26 +114,36 @@
 
 	onMount(async () => {
 		// Initialize the map
-		map = L.map('map').setView([37.61916, -122.37412], 11);
+		map = L.map('map').setView([centerLat, centerLon], 9);
 		L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png', {
 			maxZoom: 19,
 			attribution:
 				'&copy; <a href="http://www.openstreetmap.org/copyright">CartoDB</a> | Aircraft data: <a href="https://adsb.fi">adsb.fi</a>'
 		}).addTo(map);
 
-		const lamin = 36.983229; // minimum latitude
-		const lomin = -123.255615; // minimum longitude
-		const lamax = 38.237181; // maximum latitude
-		const lomax = -121.602173; // maximum longitude
+		// Visualize the boundary circle (optional)
+		L.circle([centerLat, centerLon], {
+			radius: distNM * 1852, // Convert NM to meters (1 NM = 1852 meters)
+			color: 'rgba(255,255,255,0.2)',
+			fillColor: 'rgba(0,0,0,0)',
+			weight: 1
+		}).addTo(map);
 
 		// Load waypoints from CSV
 		try {
-			waypoints = await csv('/data/FIX_BASE.csv');
+			const allWaypoints = await csv('/data/FIX_BASE.csv');
 
-			waypoints = waypoints.filter((wp) => {
+			// Filter waypoints using the same boundary as aircraft
+			waypoints = allWaypoints.filter((wp: any) => {
 				const lat = parseFloat(wp.LAT_DECIMAL);
 				const lng = parseFloat(wp.LONG_DECIMAL);
-				return lat >= lamin && lat <= lamax && lng >= lomin && lng <= lomax;
+
+				return (
+					lat >= boundary.minLat &&
+					lat <= boundary.maxLat &&
+					lng >= boundary.minLon &&
+					lng <= boundary.maxLon
+				);
 			});
 
 			waypointsLoaded = true;
@@ -129,7 +159,7 @@
 		// Set up polling every 5 seconds
 		pollingInterval = setInterval(() => {
 			fetchAircraftData();
-		}, 2500);
+		}, 1500);
 	});
 
 	onDestroy(() => {
@@ -139,7 +169,6 @@
 </script>
 
 <div id="map" style="width: 100%; height: 100vh;"></div>
-
 {#if map && waypointsLoaded}
 	{#each waypoints as waypoint}
 		<WaypointMarker {waypoint} {map} />
@@ -150,10 +179,8 @@
 	{#each aircraft as plane (plane[0])}
 		<AircraftMarker aircraft={plane} {map} />
 	{/each}
-	<div class="aircraft-count">
-		{aircraft.length} aircraft displayed
-	</div>
 {/if}
+<Nav />
 
 <style>
 	:global(.aircraft-icon) {
