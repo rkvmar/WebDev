@@ -28,7 +28,6 @@
 		}
 	}
 
-	// Filter aircraft based on search term
 	$: {
 		if (aircraft && aircraft.length) {
 			filteredAircraft = aircraft.filter((plane) => {
