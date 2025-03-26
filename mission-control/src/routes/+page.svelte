@@ -14,6 +14,9 @@
 	// Using Map to track aircraft by their icao24 identifier
 	let aircraftMap = new Map();
 
+	// Store waypoints by their layer (now as an array of arrays to avoid reactivity issues)
+	let waypointsArray: [string, any[]][] = [];
+
 	// Map center and search radius
 	const centerLat = 37.61916;
 	const centerLon = -122.37412;
@@ -80,7 +83,9 @@
 							plane.alt_geom || null, // baro altitude [13]
 							plane.squawk || null, // squawk [14]
 							null, // spi [15]
-							null // position source [16]
+							null, // position source [16]
+							plane.desc || null, // aircraft type [17]
+							plane.t || null //short aircraft type
 						];
 
 						// Use the icao24 as a unique key
@@ -112,16 +117,21 @@
 		}
 	}
 
+	// Define layer groups
+	let layerGroups: { [key: string]: any } = {};
+
 	onMount(async () => {
 		// Initialize the map
 		map = L.map('map').setView([centerLat, centerLon], 9);
+
+		// Add the basemap layer
 		L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png', {
 			maxZoom: 19,
 			attribution:
 				'&copy; <a href="http://www.openstreetmap.org/copyright">CartoDB</a> | Aircraft data: <a href="https://adsb.fi">adsb.fi</a>'
 		}).addTo(map);
 
-		// Visualize the boundary circle (optional)
+		// Visualize the boundary circle
 		L.circle([centerLat, centerLon], {
 			radius: distNM * 1852, // Convert NM to meters (1 NM = 1852 meters)
 			color: 'rgba(255,255,255,0.2)',
@@ -129,16 +139,34 @@
 			weight: 1
 		}).addTo(map);
 
+		// Create layer groups
+		layerGroups = {
+			SID: L.layerGroup().addTo(map),
+			STAR: L.layerGroup().addTo(map),
+			AREA: L.layerGroup().addTo(map),
+			OTHER: L.layerGroup().addTo(map),
+			AIRCRAFT: L.layerGroup().addTo(map)
+		};
+
 		// Load waypoints from CSV
 		try {
+			console.log('Loading waypoints from CSV...');
 			const allWaypoints = await csv('/data/FIX_BASE.csv');
+			console.log(`CSV loaded with ${allWaypoints.length} total waypoints`);
 
-			// Filter waypoints using the same boundary as aircraft
+			// Log the first waypoint to see its structure
+			if (allWaypoints.length > 0) {
+				console.log('Sample waypoint structure:', allWaypoints[0]);
+			}
+
+			// Filter waypoints using the boundary
 			waypoints = allWaypoints.filter((wp: any) => {
 				const lat = parseFloat(wp.LAT_DECIMAL);
 				const lng = parseFloat(wp.LONG_DECIMAL);
 
 				return (
+					!isNaN(lat) &&
+					!isNaN(lng) &&
 					lat >= boundary.minLat &&
 					lat <= boundary.maxLat &&
 					lng >= boundary.minLon &&
@@ -146,17 +174,77 @@
 				);
 			});
 
+			console.log(`Filtered down to ${waypoints.length} waypoints in the boundary`);
+
+			// Categorize waypoints - create a temporary storage
+			const waypointsByType = {
+				SID: [],
+				STAR: [],
+				AREA: [],
+				OTHER: []
+			};
+
+			// Add waypoints to the appropriate category
+			let layerKey: string;
+			waypoints.forEach((waypoint) => {
+				if (waypoint.CHARTS && typeof waypoint.CHARTS === 'string') {
+					if (waypoint.CHARTS.includes('SID')) {
+						layerKey = 'SID';
+					} else if (waypoint.CHARTS.includes('STAR')) {
+						layerKey = 'STAR';
+					} else if (waypoint.CHARTS.includes('AREA')) {
+						layerKey = 'AREA';
+					} else {
+						layerKey = 'OTHER';
+					}
+				}
+
+				// If the layer doesn't exist or the code is empty, use OTHER
+				if (!layerKey || !waypointsByType[layerKey]) {
+					layerKey = 'OTHER';
+				}
+
+				// Add the waypoint to the appropriate category
+				waypointsByType[layerKey].push(waypoint);
+			});
+
+			// Convert to array format for svelte binding
+			waypointsArray = Object.entries(waypointsByType);
+
+			// Log counts by category to verify distribution
+			waypointsArray.forEach(([type, items]) => {
+				console.log(`Waypoint type ${type}: ${items.length} items`);
+			});
+
+			// Set up layer control
+			const overlays = {
+				'SID Waypoints': layerGroups['SID'],
+				'STAR Waypoints': layerGroups['STAR'],
+				'AREA Waypoints': layerGroups['AREA'],
+				'Other Waypoints': layerGroups['OTHER'],
+				Aircraft: layerGroups['AIRCRAFT']
+			};
+
+			// Add the layer control to the map
+			L.control
+				.layers(null, overlays, {
+					collapsed: false,
+					position: 'topright'
+				})
+				.addTo(map);
+
 			waypointsLoaded = true;
-			console.log(`Loaded ${waypoints.length} waypoints in the specified region`);
+			console.log('Waypoints loaded and categorized');
 		} catch (error) {
 			console.error('Error loading waypoints:', error);
+			waypointsLoaded = true; // Set to true so the app doesn't get stuck
 		}
 
 		// Initial fetch of aircraft data
 		console.log('Performing initial aircraft data fetch...');
 		await fetchAircraftData();
 
-		// Set up polling every 5 seconds
+		// Set up polling every 1.5 seconds
 		pollingInterval = setInterval(() => {
 			fetchAircraftData();
 		}, 1500);
@@ -169,18 +257,25 @@
 </script>
 
 <div id="map" style="width: 100%; height: 100vh;"></div>
-{#if map && waypointsLoaded}
-	{#each waypoints as waypoint}
-		<WaypointMarker {waypoint} {map} />
-	{/each}
+
+<!-- Render waypoints using the Svelte component for each layer -->
+{#if map && waypointsLoaded && waypointsArray.length > 0}
+	<div style="display:none">
+		{#each waypointsArray as [layerType, layerWaypoints]}
+			{#each layerWaypoints as waypoint}
+				<WaypointMarker {waypoint} {map} layer={layerGroups[layerType]} />
+			{/each}
+		{/each}
+	</div>
 {/if}
 
 {#if map && aircraftLoaded && aircraft.length > 0}
 	{#each aircraft as plane (plane[0])}
-		<AircraftMarker aircraft={plane} {map} />
+		<AircraftMarker aircraft={plane} {map} layer={layerGroups['AIRCRAFT']} />
 	{/each}
 {/if}
-<Nav />
+
+<Nav {aircraft} />
 
 <style>
 	:global(.aircraft-icon) {
@@ -194,15 +289,18 @@
 		display: inline-block;
 	}
 
-	.aircraft-count {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		background-color: rgba(0, 0, 0, 0.7);
-		color: white;
-		padding: 5px 10px;
-		font-size: 14px;
+	:global(.leaflet-control-layers) {
+		background-color: rgba(255, 255, 255, 0.8);
+		border-radius: 5px;
+		padding: 6px 10px;
+	}
+
+	:global(.leaflet-control-layers-overlays) {
+		color: black;
+		font-size: 0.9em;
+	}
+
+	:global(.leaflet-control) {
 		z-index: 1000;
-		border-radius: 3px;
 	}
 </style>

@@ -1,6 +1,7 @@
 <script>
 	export let aircraft;
 	export let map;
+	export let layer = null;
 
 	import { onMount, onDestroy, afterUpdate } from 'svelte';
 
@@ -15,6 +16,8 @@
 		const latitude = parseFloat(aircraft[6]);
 		const altitude = aircraft[7];
 		const heading = aircraft[10]; // Track angle in degrees
+		const desc = aircraft[17];
+		const shortdesc = aircraft[18];
 
 		if (latitude && longitude) {
 			const rotationAngle = heading !== null ? heading - 45 : 0;
@@ -34,17 +37,24 @@
 				marker.setIcon(aircraftIcon);
 				// Update popup content
 				marker.getPopup().setContent(`
-					<strong>${callsign}</strong> (${icao24})<br>
+					<strong>${callsign}</strong> (${shortdesc || icao24})<br>
 					Altitude: ${altitude ? `${Math.round(altitude)}ft` : 'N/A'}<br>
 					Heading: ${heading !== null ? `${Math.round(heading)}°` : 'N/A'}
 				`);
 			} else {
 				// Create new marker
-				marker = L.marker([latitude, longitude], { icon: aircraftIcon }).addTo(map).bindPopup(`
-					<strong>${callsign}</strong> (${icao24})<br>
-					Altitude: ${altitude ? `${Math.round(altitude)}ft` : 'N/A'}<br>
-					Heading: ${heading !== null ? `${Math.round(heading)}°` : 'N/A'}
-				`);
+				marker = L.marker([latitude, longitude], { icon: aircraftIcon }).bindPopup(`
+						<strong>${callsign}</strong> (${shortdesc || icao24})<br>
+						Altitude: ${altitude ? `${Math.round(altitude)}ft` : 'N/A'}<br>
+						Heading: ${heading !== null ? `${Math.round(heading)}°` : 'N/A'}
+					`);
+
+				// Add to specific layer if provided, otherwise add directly to map
+				if (layer) {
+					marker.addTo(layer);
+				} else {
+					marker.addTo(map);
+				}
 			}
 		}
 	}
