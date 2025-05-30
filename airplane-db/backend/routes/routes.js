@@ -35,7 +35,8 @@ router.post('/airplanes/add', (req, res) => {
     registration: req.body.registration,
     model: req.body.model,
     airline: req.body.airline,
-    category: req.body.category
+    category: req.body.category,
+    image: req.body.image,
   })
     .then(airplane => {
       console.log(airplane)

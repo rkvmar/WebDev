@@ -9,26 +9,20 @@ const airplaneSchema = new Schema({
   },
   model: {
     type: String,
-    required: true,
     default: "N/A"
   },
   airline: {
     type: String,
-    required: true,
+    default: "N/A"
+  },
+  serial: {
+    type: Number,
+    unique: true,
     default: "N/A"
   },
   category: {
     type: String,
-    enum: ["Passenger", "Cargo", "GA"],
-    default: "Passenger"
-  },
-  image: {
-    type: String,
-  },
-  found: {
-    type: Boolean,
-    required: true,
-    default: false
+    enum: ["Passenger", "Cargo", "Military", "GA"]
   }
 
 });
